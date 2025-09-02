@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.env
+.env
+.venv/
+venv/
+ENV/
+env/
+*.egg-info/
+*.egg
+
+# Streamlit cache
+.streamlit/
+
+# VSCode
+.vscode/
+
+# Dados e arquivos sensíveis
+data/dados.xlsx
+*.db
+*.sqlite3
+
+# Arquivos temporários
+*.log
+*.tmp
+*.bak
+
+# Imagens geradas ou temporárias
+*.png
+*.jpg
+*.jpeg
+
+# Jupyter Notebooks checkpoints
+.ipynb_checkpoints/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
