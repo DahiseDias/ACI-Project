@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Q&A com IA e Análises</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="status-indicator status-online" id="status">🟢 Sistema Online</div>
+            <h1>🤖 Assistente IA com Análises Avançadas</h1>
+            <p>Faça perguntas sobre seus dados e visualize análises de MTTF, MTTR e Disponibilidade</p>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-section">
+                <div class="chat-container" id="chatContainer">
+                    <div class="message ai-message">
+                        <div class="bubble">
+                            👋 Olá! Sou seu assistente de IA especializado em análise de dados de manutenção.
+                            Posso responder perguntas sobre MTTF, MTTR, disponibilidade, falhas por subsistema e muito
+                            mais!
+                            <br><br>
+                            📊 <strong>Novidade:</strong> Agora com gráficos interativos ao lado para visualizar suas
+                            análises!
+                            <br><br>
+                            💡 <strong>Dica:</strong> Pergunte sobre subsistemas específicos para ver o botão "Mais
+                            Resultados" com relatório detalhado.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="loading" id="loading">
+                    <span class="loading-dots">🤖 Processando sua pergunta e gerando gráficos</span>
+                </div>
+
+                <div class="input-container">
+                    <input type="text" class="input-field" id="questionInput"
+                        placeholder="Digite sua pergunta sobre MTTF, MTTR, disponibilidade..."
+                        onkeypress="handleKeyPress(event)">
+                    <button class="send-button" id="sendButton" onclick="sendQuestion()">Enviar</button>
+                </div>
+
+                <div class="examples">
+                    <h3>💡 Teste estes exemplos para ver o botão "Mais Resultados":</h3>
+                    <div class="example-button" onclick="setQuestion('Qual é o MTTF de SINCDVROD?')">MTTF de SINCDVROD</div>
+                    <div class="example-button" onclick="setQuestion('Como está o CIRCUITO VIA?')">Status CIRCUITO VIA</div>
+                    <div class="example-button" onclick="setQuestion('Problemas na SINALIZAÇÃO')">Problemas SINALIZAÇÃO</div>
+                    <div class="example-button" onclick="setQuestion('Mostre dados de TELECOMUNICAÇÃO')">Dados TELECOMUNICAÇÃO</div>
+                    <div class="example-button" onclick="setQuestion('Análise do sistema ENERGIA')">Sistema ENERGIA</div>
+                </div>
+            </div>
+
+            <div class="charts-section" id="chartsSection">
+                <div class="charts-header">
+                    <h2>📊 Análises em Tempo Real</h2>
+                    <p>Gráficos atualizados baseados em suas perguntas</p>
+                </div>
+
+                <div class="chart-status" id="chartStatus">
+                    ✅ Gráficos carregados e prontos para uso
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-value" id="totalSystems">5</div>
+                    <div class="metric-label">Subsistemas Monitorados</div>
+                </div>
+
+                <div class="chart-container" id="mttfContainer">
+                    <div class="chart-title">📈 MTTF por Subsistema (horas)</div>
+                    <div class="chart-canvas">
+                        <canvas id="mttfChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container" id="mttrContainer">
+                    <div class="chart-title">🔧 MTTR por Subsistema (horas)</div>
+                    <div class="chart-canvas">
+                        <canvas id="mttrChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container" id="availabilityContainer">
+                    <div class="chart-title">✅ Disponibilidade por Subsistema (%)</div>
+                    <div class="chart-canvas">
+                        <canvas id="availabilityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-container" id="failureContainer">
+                    <div class="chart-title">⚠️ Subsistemas que Mais Falham</div>
+                    <div class="chart-canvas">
+                        <canvas id="failureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
