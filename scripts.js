@@ -100,6 +100,41 @@ function waitForChartJS(callback) {
     }
 }
 
+// Add this to your chart configuration options
+const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            position: 'bottom',
+            labels: {
+                boxWidth: 12,
+                padding: 15,
+                font: {
+                    size: 12
+                }
+            }
+        }
+    },
+    scales: {
+        y: {
+            beginAtZero: true,
+            ticks: {
+                font: {
+                    size: 11
+                }
+            }
+        },
+        x: {
+            ticks: {
+                font: {
+                    size: 11
+                }
+            }
+        }
+    }
+};
+
 // Inicializar gráficos
 function initializeCharts() {
     // Gráfico MTTF
@@ -116,25 +151,7 @@ function initializeCharts() {
                 borderWidth: 2
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Horas'
-                    }
-                }
-            }
-        }
+        options: chartOptions
     });
 
     // Gráfico MTTR
@@ -151,25 +168,7 @@ function initializeCharts() {
                 borderWidth: 2
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Horas'
-                    }
-                }
-            }
-        }
+        options: chartOptions
     });
 
     // Gráfico Disponibilidade
@@ -244,6 +243,22 @@ function initializeCharts() {
     // Atualizar status
     document.getElementById('chartStatus').innerHTML = '✅ Todos os gráficos carregados com sucesso!';
     document.getElementById('chartStatus').style.background = '#d4edda';
+}
+
+function initializeTabs() {
+    const tabs = document.querySelectorAll('.tab-button');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and sections
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding section
+            tab.classList.add('active');
+            const targetSection = document.getElementById(tab.dataset.tab + 'Section');
+            targetSection.classList.add('active');
+        });
+    });
 }
 
 function setQuestion(question) {
@@ -416,38 +431,11 @@ function addMessage(text, sender, confidence = null, sources = null, isMetricQue
     bubbleDiv.innerHTML = text;
 
     messageDiv.appendChild(bubbleDiv);
-
-    // Adiciona confiança se existir
-    if (confidence !== null && sender === 'ai') {
-        const confidenceDiv = document.createElement('div');
-        confidenceDiv.classList.add('confidence');
-        confidenceDiv.innerHTML = `Confiança: <strong>${confidence.toFixed(1)}%</strong>`;
-        messageDiv.appendChild(confidenceDiv);
-    }
-
-    // Adiciona fontes se existirem
-    if (sources && sources.length > 0 && sender === 'ai') {
-        const sourcesDiv = document.createElement('div');
-        sourcesDiv.classList.add('sources');
-        sourcesDiv.innerHTML = `Fontes: ${sources.join(', ')}`;
-        messageDiv.appendChild(sourcesDiv);
-    }
-
-    // Exemplo de botão "Mais Resultados" apenas para perguntas de subsistema
-    if (sender === 'ai' && subsystem) {
-        const moreButton = document.createElement('button');
-        moreButton.classList.add('more-results-button');
-        moreButton.innerText = 'Mais Resultados';
-        moreButton.onclick = () => {
-            alert(`Relatório detalhado do subsistema ${subsystem} em breve!`);
-        };
-        messageDiv.appendChild(moreButton);
-    }
-
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
 window.onload = function() {
     waitForChartJS(initializeCharts);
+    initializeTabs();
 };

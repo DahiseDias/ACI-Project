@@ -9,14 +9,19 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="status-indicator status-online" id="status">🟢 Sistema Online</div>
-            <h1>🤖 Assistente IA com Análises Avançadas</h1>
-            <p>Faça perguntas sobre seus dados e visualize análises de MTTF, MTTR e Disponibilidade</p>
-        </div>
+        <header class="main-header">
+            <div class="header-left">
+                <h1>🤖 IA Assistant</h1>
+                <div class="status-indicator status-online" id="status">🟢 Online</div>
+            </div>
+            <nav class="tab-navigation">
+                <button class="tab-button active" data-tab="chat">💬 Chat</button>
+                <button class="tab-button" data-tab="charts">📊 Gráficos</button>
+            </nav>
+        </header>
 
-        <div class="main-content">
-            <div class="chat-section">
+        <main class="main-content">
+            <div class="section chat-section active" id="chatSection">
                 <div class="chat-container" id="chatContainer">
                     <div class="message ai-message">
                         <div class="bubble">
@@ -54,7 +59,7 @@
                 </div>
             </div>
 
-            <div class="charts-section" id="chartsSection">
+            <div class="section charts-section" id="chartsSection">
                 <div class="charts-header">
                     <h2>📊 Análises em Tempo Real</h2>
                     <p>Gráficos atualizados baseados em suas perguntas</p>
@@ -97,7 +102,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
     <script src="scripts.js"></script>
 </body>
