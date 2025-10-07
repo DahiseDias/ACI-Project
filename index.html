@@ -11,7 +11,7 @@
     <div class="container">
         <header class="main-header">
             <div class="header-left">
-                <h1>🤖 IA Assistant</h1>
+                <h1>FerrovIA - Assistente</h1>
                 <div class="status-indicator status-online" id="status">🟢 Online</div>
             </div>
             <nav class="tab-navigation">
@@ -24,6 +24,9 @@
             <div class="section chat-section active" id="chatSection">
                 <div class="chat-container" id="chatContainer">
                     <div class="message ai-message">
+                        <div class="ai-profile">
+                            <img src="Avatar.png" alt="AI Assistant" class="ai-avatar">
+                        </div>
                         <div class="bubble">
                             👋 Olá! Sou seu assistente de IA especializado em análise de dados de manutenção.
                             Posso responder perguntas sobre MTTF, MTTR, disponibilidade, falhas por subsistema e muito
@@ -61,30 +64,42 @@
 
             <div class="section charts-section" id="chartsSection">
                 <div class="charts-header">
-                    <h2>📊 Análises em Tempo Real</h2>
-                    <p>Gráficos atualizados baseados em suas perguntas</p>
-                </div>
-
-                <div class="chart-status" id="chartStatus">
-                    ✅ Gráficos carregados e prontos para uso
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-value" id="totalSystems">5</div>
-                    <div class="metric-label">Subsistemas Monitorados</div>
-                </div>
-
-                <div class="chart-container" id="mttfContainer">
-                    <div class="chart-title">📈 MTTF por Subsistema (horas)</div>
-                    <div class="chart-canvas">
-                        <canvas id="mttfChart"></canvas>
+                    <div class="charts-header-content">
+                        <h2 class="charts-title">📊 Análises em Tempo Real</h2>
+                        <p class="charts-subtitle">Gráficos atualizados baseados em suas perguntas</p>
+                        
+                        <div class="charts-stats">
+                            <div class="stat-item">
+                                <div class="stat-value" id="totalSystems">5</div>
+                                <div class="stat-label">Subsistemas Monitorados</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">98%</div>
+                                <div class="stat-label">Disponibilidade Média</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value status-value">
+                                    <span class="status-dot">🟢</span>
+                                </div>
+                                <div class="stat-label" id="chartStatus">Sistema Operacional</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="chart-container" id="mttrContainer">
-                    <div class="chart-title">🔧 MTTR por Subsistema (horas)</div>
-                    <div class="chart-canvas">
+                <div class="charts-row">
+                    <div class="chart-container" id="mttfContainer">
+                        <div class="chart-title">📈 MTTF por Subsistema (horas)</div>
+                        <div class="chart-canvas">
+                        <canvas id="mttfChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container" id="mttrContainer">
+                        <div class="chart-title">🔧 MTTR por Subsistema (horas)</div>
+                        <div class="chart-canvas">
                         <canvas id="mttrChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -97,7 +112,7 @@
 
                 <div class="chart-container" id="failureContainer">
                     <div class="chart-title">⚠️ Subsistemas que Mais Falham</div>
-                    <div class="chart-canvas">
+                    <div class="chart-canvas" id="donutchart">
                         <canvas id="failureChart"></canvas>
                     </div>
                 </div>

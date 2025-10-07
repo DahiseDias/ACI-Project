@@ -426,11 +426,41 @@ function addMessage(text, sender, confidence = null, sources = null, isMetricQue
     messageDiv.classList.add('message');
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
 
-    const bubbleDiv = document.createElement('div');
-    bubbleDiv.classList.add('bubble');
-    bubbleDiv.innerHTML = text;
+    let messageContent = '';
+    
+    if (sender === 'ai') {
+        // Adiciona o perfil da IA em todas as mensagens do assistente
+        messageContent += `
+            <div class="ai-profile">
+                <img src="Avatar.png" alt="AI Assistant" class="ai-avatar">
+            </div>
+        `;
+    }
 
-    messageDiv.appendChild(bubbleDiv);
+    messageContent += `<div class="bubble">`;
+    messageContent += text;
+
+    // Adiciona informações de confiança se disponíveis
+    if (confidence !== null) {
+        messageContent += `
+            <div class="confidence-info">
+                <small>Confiança: ${(confidence * 100).toFixed(1)}%</small>
+            </div>
+        `;
+    }
+
+    // Adiciona fontes se disponíveis
+    if (sources && sources.length > 0) {
+        messageContent += `
+            <div class="sources-info">
+                <small>Fontes: ${sources.join(', ')}</small>
+            </div>
+        `;
+    }
+
+    messageContent += `</div>`;
+    messageDiv.innerHTML = messageContent;
+    
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }

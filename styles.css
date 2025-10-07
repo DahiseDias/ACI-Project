@@ -17,7 +17,9 @@ body {
     flex-direction: column;
     background: white;
 }
-
+.chat-container{
+    flex-grow: 2;
+}
 /* Header styles */
 .main-header {
     display: flex;
@@ -103,17 +105,45 @@ body {
     max-height: none;
 }
 
-.chat-container {
-    height: 400px;
-    overflow-y: scroll;
-    padding: 20px;
-    background: #f8f9fa;
+.chart-container {
+  flex: 1 1 300px;
+  min-width: 0;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+.chart-canvas {
+  position: relative;
+  width: 100%;
+  height: 300px !important; /* Add fixed height */
+}
+
+.chart-canvas #donutchart {
+  position: relative;
+  width: 100%;
+}
+.chart-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.chart-canvas canvas {
+  width: 100% !important;
+  /* height: 100% !important; Force canvas to respect container height */
+  display: block;
 }
 
 .charts-section {
     gap: 1rem;
 }
-
+.charts-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
 /* Chart styles */
 .chart-container {
     background: white;
@@ -124,14 +154,9 @@ body {
     position: relative;
     width: 100%;
     height: auto;
-    min-height: 300px;
+    /* min-height: 300px; */
 }
 
-.chart-canvas {
-    position: relative;
-    width: 100% !important;
-    height: 100% !important;
-}
 
 .chart-title {
     font-size: 1rem;
@@ -144,6 +169,39 @@ body {
     animation: fadeIn 0.5s ease-in;
 }
 
+.ai-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px; /* Aumentado de 12px para 16px */
+    padding-left: 4px; /* Adiciona um pequeno padding para o efeito hover não ser cortado */
+}
+
+.ai-profile {
+    flex-shrink: 0;
+    width: 48px;  /* Aumentado de 40px para 48px */
+    height: 48px; /* Aumentado de 40px para 48px */
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f0f0f0;
+    border: 2px solid #4FACFE;
+    transition: transform 0.2s ease; /* Adiciona transição suave */
+}
+
+/* Adicionando efeito hover para zoom */
+.ai-profile:hover {
+    transform: scale(1.6); /* Aumenta 20% no hover */
+    z-index: 1; /* Garante que fique sobre outros elementos */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Adiciona sombra no hover */
+}
+
+.ai-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.8);
+    transition: transform 0.2s ease; /* Adiciona transição suave */
+}
+
 .ai-message .bubble {
     background: white;
     color: #333;
@@ -154,6 +212,7 @@ body {
     word-wrap: break-word;
     border: 2px solid #e9ecef;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-left: 0;
 }
 
 .user-message {
@@ -253,6 +312,100 @@ body {
     background: #4facfe;
     color: white;
     border-color: #4facfe;
+}
+
+/* Add or update these styles */
+.charts-header {
+    background: white;
+    padding: 24px 32px;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.charts-header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.loading {
+
+    display: none;
+    text-align: center;
+    padding: 20px;
+    color: #666;
+
+}
+
+.loading-dots {
+
+    display: inline-block;
+    animation: loading 1.5s infinite;
+
+}
+
+.charts-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.charts-subtitle {
+    font-size: 16px;
+    color: #718096;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.charts-stats {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+}
+
+.stat-item {
+    flex: 1;
+    text-align: center;
+    padding: 0 16px;
+    border-right: 1px solid #e2e8f0;
+}
+
+.stat-item:last-child {
+    border-right: none;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.status-dot {
+    font-size: 24px;
+    margin-right: 8px;
+}
+
+/* Remove the old chart-status and metric-card styles if they exist */
+.chart-status, .metric-card {
+    display: none;
 }
 
 /* Responsive adjustments */
