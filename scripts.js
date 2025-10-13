@@ -1,6 +1,9 @@
 // Variável global para armazenar histórico de conversas
 let conversation_history = [];
 
+// Configuração da URL da API para fácil manutenção e deploy
+const API_BASE_URL = 'http://127.0.0.1:8000/agents/echo';
+
 // Função para criar dados de exemplo garantidos para os gráficos
 function createSampleChartData() {
     return {
@@ -97,6 +100,88 @@ function waitForChartJS(callback) {
         callback();
     } else {
         setTimeout(() => waitForChartJS(callback), 100);
+    }
+}
+
+// Add this function after the conversation_history declaration at the top
+async function getLlmResponseFromQA(userInput) {
+    console.log(`Processing question with QA: ${userInput}`);
+    
+    try {
+        const response = await fetch(API_BASE_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: userInput })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Aguarda e lê o corpo da resposta
+        const result = await response.json();
+        console.log("Response from API:", result);
+
+        // Retorna o conteúdo da resposta da API
+        return result.text;
+
+    } catch (error) {
+        console.error(`Error calling QA: ${error}`);
+        return { error: `Error processing your request: ${error.message}` };
+    }
+}
+
+
+// Modify the processQuestion function to use the new QA function
+async function processQuestion(question) {
+    try {
+        const result = await getLlmResponseFromQA(question);
+        // If you want to keep the demo functionality while testing:
+        //const demoResult = generateDemoAnswer(question);
+        
+        // Combine the LLM response with your existing display logic
+        displayResult({
+            answer: result,
+            confidence: null,
+            sources: null,
+            subsystem: extractSubsystemFromQuestion(question)
+        }, question);
+    } catch (error) {
+        console.error('Error processing question:', error);
+        displayResult({
+            error: true,
+            answer: 'Sorry, there was an error processing your question.'
+        }, question);
+    }
+}
+
+// Update the sendQuestion function to handle async/await
+async function sendQuestion() {
+    const input = document.getElementById('questionInput');
+    const question = input.value.trim();
+
+    if (!question) {
+        alert('Por favor, digite uma pergunta!');
+        return;
+    }
+
+    // Adicionar pergunta do usuário
+    addMessage(question, 'user');
+
+    // Limpar input e mostrar loading
+    input.value = '';
+    showLoading(true);
+
+    // Process question with await
+    try {
+        await processQuestion(question);
+    } catch (error) {
+        console.error('Error in sendQuestion:', error);
+        showLoading(false);
+        addMessage('Desculpe, ocorreu um erro ao processar sua pergunta.', 'ai');
     }
 }
 
@@ -272,27 +357,27 @@ function handleKeyPress(event) {
     }
 }
 
-function sendQuestion() {
-    const input = document.getElementById('questionInput');
-    const question = input.value.trim();
+// function sendQuestion() {
+//     const input = document.getElementById('questionInput');
+//     const question = input.value.trim();
 
-    if (!question) {
-        alert('Por favor, digite uma pergunta!');
-        return;
-    }
+//     if (!question) {
+//         alert('Por favor, digite uma pergunta!');
+//         return;
+//     }
 
-    // Adicionar pergunta do usuário
-    addMessage(question, 'user');
+//     // Adicionar pergunta do usuário
+//     addMessage(question, 'user');
 
-    // Limpar input e mostrar loading
-    input.value = '';
-    showLoading(true);
+//     // Limpar input e mostrar loading
+//     input.value = '';
+//     showLoading(true);
 
-    // Processar pergunta
-    setTimeout(() => {
-        processQuestion(question);
-    }, 1000);
-}
+//     // Processar pergunta
+//     setTimeout(() => {
+//         processQuestion(question);
+//     }, 1000);
+// }
 
 function showLoading(show) {
     const loading = document.getElementById('loading');
@@ -307,60 +392,6 @@ function showLoading(show) {
     }
 }
 
-function processQuestion(question) {
-    // Simular processamento da pergunta
-    setTimeout(() => {
-        const result = generateDemoAnswer(question);
-        displayResult(result, question);
-    }, 2000);
-}
-
-function generateDemoAnswer(question) {
-    const lowerQuestion = question.toLowerCase();
-
-    if (lowerQuestion.includes('sincdvrod')) {
-        return {
-            answer: "O SINCDVROD apresenta MTTF de 2.840 horas e MTTR de 4,2 horas, resultando em disponibilidade de 99,85%. Este subsistema representa 19,4% das ocorrências totais do sistema[...]",
-            confidence: 89.5,
-            sources: ["Documento 1", "Documento 2", "Documento 3"],
-            subsystem: 'SINCDVROD'
-        };
-    } else if (lowerQuestion.includes('circuito') || lowerQuestion.includes('via')) {
-        return {
-            answer: "O CIRCUITO VIA é o subsistema com maior número de ocorrências (45 registros - 27,3% do total). Apresenta MTTF de 3.200 horas e MTTR de 6,8 horas, com disponibilidade de 99,78%.",
-            confidence: 92.1,
-            sources: ["Documento 1", "Documento 2"],
-            subsystem: 'CIRCUITO VIA'
-        };
-    } else if (lowerQuestion.includes('sinalização')) {
-        return {
-            answer: "O sistema de SINALIZAÇÃO registra 38 ocorrências (23% do total), com MTTF de 2.950 horas e MTTR de 5,1 horas. A disponibilidade é de 99,83%. É o segundo subsistema em ocorrências.",
-            confidence: 87.8,
-            sources: ["Documento 1", "Documento 2", "Documento 3"],
-            subsystem: 'SINALIZAÇÃO'
-        };
-    } else if (lowerQuestion.includes('telecomunicação')) {
-        return {
-            answer: "TELECOMUNICAÇÃO é o subsistema com melhor desempenho: maior MTTF (4.100h), menor MTTR (3,9h) e maior disponibilidade (99,90%). Apenas 22 ocorrências registradas (13,3%).",
-            confidence: 94.2,
-            sources: ["Documento 1", "Documento 2"],
-            subsystem: 'TELECOMUNICAÇÃO'
-        };
-    } else if (lowerQuestion.includes('energia')) {
-        return {
-            answer: "O sistema de ENERGIA apresenta 28 ocorrências (17% do total), MTTF de 3.650 horas e o maior MTTR (7,2 horas). Disponibilidade de 99,80%. O alto MTTR indica necessidade de atenção.",
-            confidence: 88.7,
-            sources: ["Documento 1", "Documento 2", "Documento 3"],
-            subsystem: 'ENERGIA'
-        };
-    } else {
-        return {
-            answer: "Esta é uma resposta de demonstração. Para ver o botão 'Mais Resultados', faça perguntas específicas sobre os subsistemas: SINCDVROD, CIRCUITO VIA, SINALIZAÇÃO, TELECOMUNICAÇÃO ou ENERGIA.",
-            confidence: 75.0,
-            sources: ["Documento 1"]
-        };
-    }
-}
 
 function extractSubsystemFromQuestion(question) {
     const lowerQuestion = question.toLowerCase();
