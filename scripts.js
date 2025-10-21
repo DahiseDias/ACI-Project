@@ -4,27 +4,112 @@ let conversation_history = [];
 // Configuração da URL da API para fácil manutenção e deploy
 const API_BASE_URL = 'http://127.0.0.1:8000/agents/echo';
 
+// Função para buscar dados MTTR da API
+async function fetchMTTRData() {
+    try {
+        const response = await fetch('http://127.0.0.1:8000/metrics/mttr');
+        const data = await response.json();
+        
+        // Sort by MTTR hours in descending order and get top 10
+        const top10Data = data
+            .sort((a, b) => b.mttr_horas - a.mttr_horas)
+            .slice(0, 10);
+
+        return {
+            labels: top10Data.map(item => item.subsistema),
+            values: top10Data.map(item => item.mttr_horas)
+        };
+    } catch (error) {
+        console.error('Erro ao buscar dados MTTR:', error);
+        return null;
+    }
+}
+
+// Função para buscar dados MTTF da API
+async function fetchMTTFData() {
+    try {
+        const response = await fetch('http://127.0.0.1:8000/metrics/mttf');
+        const data = await response.json();
+        
+        // Sort by MTTF days in descending order and get top 10
+        const top10Data = data
+            .sort((a, b) => b.mttf_dias - a.mttf_dias)
+            .slice(0, 10);
+
+        return {
+            labels: top10Data.map(item => item.subsistema),
+            // Convertendo dias para horas (1 dia = 24 horas)
+            values: top10Data.map(item => item.mttf_dias * 24)
+        };
+    } catch (error) {
+        console.error('Erro ao buscar dados MTTF:', error);
+        return null;
+    }
+}
+
+// Função para buscar dados de disponibilidade da API
+async function fetchAvailabilityData() {
+    try {
+        const response = await fetch('http://127.0.0.1:8000/metrics/disponibilidade');
+        const data = await response.json();
+        
+        // Sort by availability in descending order and get top 10
+        const top10Data = data
+            .sort((a, b) => b.disponibilidade - a.disponibilidade)
+            .slice(0, 10);
+
+        return {
+            labels: top10Data.map(item => item.subsistema),
+            values: top10Data.map(item => item.disponibilidade)
+        };
+    } catch (error) {
+        console.error('Erro ao buscar dados de disponibilidade:', error);
+        return null;
+    }
+}
+
+// Função para buscar dados de falhas da API
+async function fetchFailureData() {
+    try {
+        const response = await fetch('http://127.0.0.1:8000/metrics/falhas');
+        const data = await response.json();
+        
+        // Sort by number of failures in descending order and get top 10
+        const top10Data = data
+            .sort((a, b) => b.quantidade_falhas - a.quantidade_falhas)
+            .slice(0, 10);
+
+        return {
+            labels: top10Data.map(item => item.subsistema),
+            values: top10Data.map(item => item.quantidade_falhas)
+        };
+    } catch (error) {
+        console.error('Erro ao buscar dados de falhas:', error);
+        return null;
+    }
+}
+
 // Função para criar dados de exemplo garantidos para os gráficos
 function createSampleChartData() {
     return {
         mttf_data: {
-            labels: ['SINCDVROD', 'CIRCUITO VIA', 'SINALIZAÇÃO', 'TELECOMUNICAÇÃO', 'ENERGIA'],
-            values: [2840, 3200, 2950, 4100, 3650],
+            labels: [],
+            values: [],
             title: 'MTTF por Subsistema (horas)'
         },
         mttr_data: {
-            labels: ['SINCDVROD', 'CIRCUITO VIA', 'SINALIZAÇÃO', 'TELECOMUNICAÇÃO', 'ENERGIA'],
-            values: [4.2, 6.8, 5.1, 3.9, 7.2],
+            labels: [],
+            values: [],
             title: 'MTTR por Subsistema (horas)'
         },
         availability_data: {
-            labels: ['SINCDVROD', 'CIRCUITO VIA', 'SINALIZAÇÃO', 'TELECOMUNICAÇÃO', 'ENERGIA'],
-            values: [99.85, 99.78, 99.83, 99.90, 99.80],
+            labels: [],
+            values: [],
             title: 'Disponibilidade por Subsistema (%)'
         },
         failure_systems: {
-            labels: ['CIRCUITO VIA', 'SINALIZAÇÃO', 'SINCDVROD', 'ENERGIA', 'TELECOMUNICAÇÃO'],
-            values: [45, 38, 32, 28, 22],
+            labels: [],
+            values: [],
             title: 'Subsistemas que Mais Falham'
         }
     };
@@ -89,11 +174,6 @@ chart_data = createSampleChartData();
 const chartData = chart_data;
 let charts = {};
 
-// Lista de subsistemas para detecção GARANTIDA
-const subsystems = [
-    'SINCDVROD', 'CIRCUITO VIA', 'SINALIZAÇÃO', 'TELECOMUNICAÇÃO', 'ENERGIA',
-    'sincdvrod', 'circuito via', 'sinalização', 'telecomunicação', 'energia'
-];
 
 function waitForChartJS(callback) {
     if (typeof Chart !== 'undefined') {
@@ -221,8 +301,14 @@ const chartOptions = {
 };
 
 // Inicializar gráficos
-function initializeCharts() {
-    // Gráfico MTTF
+async function initializeCharts() {
+    // Gráfico MTTF - Agora usando dados da API
+    const mttfData = await fetchMTTFData();
+    if (mttfData) {
+        chartData.mttf_data.labels = mttfData.labels;
+        chartData.mttf_data.values = mttfData.values;
+    }
+
     const ctx1 = document.getElementById('mttfChart').getContext('2d');
     charts.mttf = new Chart(ctx1, {
         type: 'bar',
@@ -239,7 +325,13 @@ function initializeCharts() {
         options: chartOptions
     });
 
-    // Gráfico MTTR
+    // Gráfico MTTR - Agora usando dados da API
+    const mttrData = await fetchMTTRData();
+    if (mttrData) {
+        chartData.mttr_data.labels = mttrData.labels;
+        chartData.mttr_data.values = mttrData.values;
+    }
+    
     const ctx2 = document.getElementById('mttrChart').getContext('2d');
     charts.mttr = new Chart(ctx2, {
         type: 'bar',
@@ -256,7 +348,13 @@ function initializeCharts() {
         options: chartOptions
     });
 
-    // Gráfico Disponibilidade
+    // Gráfico Disponibilidade - Agora usando dados da API
+    const availabilityData = await fetchAvailabilityData();
+    if (availabilityData) {
+        chartData.availability_data.labels = availabilityData.labels;
+        chartData.availability_data.values = availabilityData.values;
+    }
+
     const ctx3 = document.getElementById('availabilityChart').getContext('2d');
     charts.availability = new Chart(ctx3, {
         type: 'line',
@@ -283,7 +381,7 @@ function initializeCharts() {
             },
             scales: {
                 y: {
-                    min: 99.5,
+                    min: Math.min(...(chartData.availability_data.values.length ? chartData.availability_data.values : [99.5])) - 0.1,
                     max: 100,
                     title: {
                         display: true,
@@ -294,7 +392,13 @@ function initializeCharts() {
         }
     });
 
-    // Gráfico Falhas por Subsistema
+    // Gráfico Falhas por Subsistema - Agora usando dados da API
+    const failureData = await fetchFailureData();
+    if (failureData) {
+        chartData.failure_systems.labels = failureData.labels;
+        chartData.failure_systems.values = failureData.values;
+    }
+
     const ctx4 = document.getElementById('failureChart').getContext('2d');
     charts.failure = new Chart(ctx4, {
         type: 'doughnut',
@@ -308,7 +412,12 @@ function initializeCharts() {
                     'rgba(54, 162, 235, 0.8)',
                     'rgba(255, 205, 86, 0.8)',
                     'rgba(75, 192, 192, 0.8)',
-                    'rgba(153, 102, 255, 0.8)'
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(201, 203, 207, 0.8)',
+                    'rgba(255, 99, 255, 0.8)',
+                    'rgba(99, 255, 132, 0.8)',
+                    'rgba(132, 99, 255, 0.8)'
                 ],
                 borderWidth: 2
             }]
@@ -320,6 +429,17 @@ function initializeCharts() {
                 legend: {
                     display: true,
                     position: 'right'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} falhas (${percentage}%)`;
+                        }
+                    }
                 }
             }
         }
@@ -497,6 +617,8 @@ function addMessage(text, sender, confidence = null, sources = null, isMetricQue
 }
 
 window.onload = function() {
-    waitForChartJS(initializeCharts);
-    initializeTabs();
+    waitForChartJS(async () => {
+        await initializeCharts();
+        initializeTabs();
+    });
 };
