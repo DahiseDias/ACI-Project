@@ -215,6 +215,14 @@ body {
     margin-left: 0;
 }
 
+.ai-message .bubble ul,
+.ai-message .bubble ol {
+    margin-left: 1.2rem;     /* recuo garante o bullet dentro do balão */
+    padding-left: 1rem;      /* reforço para navegadores diferentes */
+    list-style-position: outside;
+}
+
+
 .user-message {
     text-align: right;
     padding-right: 16px;

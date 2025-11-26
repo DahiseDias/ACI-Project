@@ -570,12 +570,54 @@ function highlightRelevantCharts(question) {
     }
 }
 
+function formatTechnicalText(text) {
+    if (!text) return "";
+
+    let md = text.trim();
+
+    // --- Títulos comuns ---
+    md = md.replace(/Para calcular o MTTF/gi, "## 📊 Cálculo do MTTF\n\nPara calcular o MTTF");
+    md = md.replace(/Com base nos dados fornecidos/gi, "\n\n### 📁 Dados fornecidos");
+
+    // --- Identificar listagem de falhas ---
+    md = md.replace(/\*?Falha\s*1[:\-]/gi, "\n- **Falha 1:**");
+    md = md.replace(/\*?Falha\s*2[:\-]/gi, "\n- **Falha 2:**");
+    md = md.replace(/\*?Falha\s*3[:\-]/gi, "\n- **Falha 3:**");
+
+    // --- Ajustar datas para melhor leitura ---
+    md = md.replace(
+        /(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/g,
+        "**$1**"
+    );
+
+    // --- Criar seção de cálculo ---
+    md = md.replace(/Calculando o intervalo entre as falhas[:\-]*/gi, "\n\n### ⏱️ Cálculo do intervalo entre falhas\n");
+    md = md.replace(/Calculando o MTTF/gi, "\n\n### 📐 Cálculo do MTTF\n");
+
+    // --- Melhorar espaçamento de frases longas ---
+    md = md.replace(/\. /g, ".\n\n");
+
+    // --- Remover espaços duplos ---
+    md = md.replace(/\n{3,}/g, "\n\n");
+     // Corrige casos como "**1. Texto**"
+    md = md.replace(/\*\*(\d+)\.\s*\n?/g, "$1. ");
+
+    // Garante formatação "1. Texto"
+    md = md.replace(/(\d+)\s*\.\s*/g, "$1. ");
+
+    return md.trim();
+}
+
+
 // Função para adicionar mensagens ao chat
 function addMessage(text, sender, confidence = null, sources = null, isMetricQuestion = false, subsystem = null) {
     const chatContainer = document.getElementById('chatContainer');
     const messageDiv = document.createElement('div');
     messageDiv.classList.add('message');
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-message');
+
+    // 👉 Formatar o texto antes de exibir
+    const formatted = (sender === 'ai') ? formatTechnicalText(text) : text;
 
     let messageContent = '';
     
@@ -589,25 +631,7 @@ function addMessage(text, sender, confidence = null, sources = null, isMetricQue
     }
 
     messageContent += `<div class="bubble">`;
-    messageContent += text;
-
-    // Adiciona informações de confiança se disponíveis
-    if (confidence !== null) {
-        messageContent += `
-            <div class="confidence-info">
-                <small>Confiança: ${(confidence * 100).toFixed(1)}%</small>
-            </div>
-        `;
-    }
-
-    // Adiciona fontes se disponíveis
-    if (sources && sources.length > 0) {
-        messageContent += `
-            <div class="sources-info">
-                <small>Fontes: ${sources.join(', ')}</small>
-            </div>
-        `;
-    }
+    messageContent += marked.parse(formatted);
 
     messageContent += `</div>`;
     messageDiv.innerHTML = messageContent;
