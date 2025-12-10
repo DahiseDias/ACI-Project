@@ -640,9 +640,51 @@ function addMessage(text, sender, confidence = null, sources = null, isMetricQue
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
+// Função para buscar a quantidade de subsistemas da API
+async function fetchTotalSystems() {
+    try {
+        const response = await fetch('http://127.0.0.1:8000/metrics/quantidade-subsistemas');
+        if (!response.ok) {
+            throw new Error(`Erro na requisição: ${response.status}`);
+        }
+        console.log(response);
+        const data = await response.json();
+
+        // Substituir o valor na tag com o ID "totalSystems"
+        const totalSystemsElement = document.getElementById('totalSystems');
+        totalSystemsElement.textContent = data.quantidade_subsistemas || 'N/A'; // Substitui pelo valor retornado ou 'N/A' se não houver
+    } catch (error) {
+        console.error('Erro ao buscar a quantidade de subsistemas:', error);
+        const totalSystemsElement = document.getElementById('totalSystems');
+        totalSystemsElement.textContent = 'Erro';
+    }
+}
+
+// Função para buscar a disponibilidade média da API
+async function fetchAverageAvailability() {
+    try {
+        const response = await fetch('http://localhost:8000/metrics/disponibilidade-media');
+        if (!response.ok) {
+            throw new Error(`Erro na requisição: ${response.status}`);
+        }
+        const data = await response.json();
+
+        // Substituir o valor na tag com o ID "disponibilidade-media"
+        const availabilityElement = document.getElementById('disponibilidade-media');
+        availabilityElement.textContent = `${data.disponibilidade_media || 'N/A'}%`; // Substitui pelo valor retornado ou 'N/A' se não houver
+    } catch (error) {
+        console.error('Erro ao buscar a disponibilidade média:', error);
+        const availabilityElement = document.getElementById('disponibilidade-media');
+        availabilityElement.textContent = 'Erro';
+    }
+}
+
+// Chamar a função ao carregar a página
 window.onload = function() {
     waitForChartJS(async () => {
         await initializeCharts();
+        await fetchTotalSystems(); // Atualiza a quantidade de subsistemas
+        await fetchAverageAvailability(); // Atualiza a disponibilidade média
         initializeTabs();
     });
 };
